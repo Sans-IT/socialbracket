@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -16,7 +17,6 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { CommentSection } from "./CommentSection";
-
 import { toast } from "@/hooks/use-toast";
 import { EllipsisVerticalIcon, PencilIcon } from "lucide-react";
 import { Session } from "next-auth";
@@ -24,7 +24,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { DeleteDialogPost } from "./DeleteDialogPost";
 import { PostMedia } from "./Postmedia";
-import Image from "next/image";
 
 export type CardPostProps = {
   item: Post & { author: User }; // Include author as part of the Post type
@@ -72,7 +71,7 @@ export default function CardPost({ item, session }: CardPostProps) {
                   </AvatarFallback>
                 </Avatar>
               </Link>
-              <Link href={`/post/${item.id}`} className="text-xl font-bold">
+              <Link href={`/post/${item.id}`} className="font-bold">
                 <span>{item.author.username}</span>
               </Link>
             </div>
@@ -108,8 +107,9 @@ export default function CardPost({ item, session }: CardPostProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-
-          <CardTitle className="font-semibold text-lg">{item.title}</CardTitle>
+          <CardDescription className="text-xs text-muted-foreground">
+            {new Date(item.createdAt).toLocaleDateString("id-ID")}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {item.type !== "NONE" ? (
@@ -118,9 +118,12 @@ export default function CardPost({ item, session }: CardPostProps) {
             </div>
           ) : null}
 
-          <span className="text-base whitespace-pre-line">
-            {item.description || null}
-          </span>
+          <div className="gap-2 flex flex-col flex-wrap">
+            <CardTitle className="font-semibold">{item.title}</CardTitle>
+            <CardDescription className="text-base whitespace-pre-line">
+              {item.description || null}
+            </CardDescription>
+          </div>
         </CardContent>
         <CardFooter className="gap-2">
           <CommentSection postProps={item} />

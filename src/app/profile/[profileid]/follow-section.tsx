@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 
 export default function FollowSection({
@@ -17,10 +18,12 @@ export default function FollowSection({
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
+  const router = useRouter();
+  const pathname = usePathname();
 
   const listUserProfile = [
-    { name: "Mengikuti", key: "following" },
-    { name: "Pengikut", key: "followers" },
+    { name: "mengikuti", key: "following" },
+    { name: "pengikut", key: "followers" },
   ];
 
   // ✅ Fetch follow status & counts
@@ -67,38 +70,40 @@ export default function FollowSection({
           <p className="text-xl font-semibold">{postCount}</p>
         </div>
         {listUserProfile.map((item) => (
-          <div key={item.key}>
-            <p>{item.name}</p>
+          <Link href={`${pathname}/${item.name}`} key={item.key}>
+            <p className="capitalize">{item.name}</p>
             <p className="text-xl font-semibold">
               {isLoadingFollowData ? "..." : followCount?.[item.key] || 0}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
 
       {/* ✅ Follow Button (Disabled for Self) */}
-      {currentUserId !== userId ? (
-        <Button
-          onClick={handleFollow}
-          disabled={followMutation.isPending || unfollowMutation.isPending}
-          variant={!isFollowing !== true ? "destructive" : "default"}
-        >
-          {isLoadingFollowData
-            ? "Loading..."
-            : followMutation.isPending || unfollowMutation.isPending
-            ? "Processing..."
-            : isFollowing
-            ? "Unfollow"
-            : "Follow"}
-        </Button>
-      ) : (
-        <Link
-          href={"/settings"}
-          className={cn(buttonVariants({ variant: "outline" }))}
-        >
-          Edit Profile
-        </Link>
-      )}
+      {session?.user ? (
+        currentUserId !== userId ? (
+          <Button
+            onClick={handleFollow}
+            disabled={followMutation.isPending || unfollowMutation.isPending}
+            variant={!isFollowing !== true ? "destructive" : "default"}
+          >
+            {isLoadingFollowData
+              ? "Loading..."
+              : followMutation.isPending || unfollowMutation.isPending
+              ? "Processing..."
+              : isFollowing
+              ? "Unfollow"
+              : "Follow"}
+          </Button>
+        ) : (
+          <Link
+            href={"/settings"}
+            className={cn(buttonVariants({ variant: "outline" }))}
+          >
+            Edit Profile
+          </Link>
+        )
+      ) : null}
     </div>
   );
 }

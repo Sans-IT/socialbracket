@@ -1,38 +1,95 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 
-// ✅ Fetch follow count & status
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const userId = searchParams.get("userId");
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const type = searchParams.get("type");
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "userId is required" },
+        { status: 400 }
+      );
+    }
+
+    if (type === "pengikut") {
+      return await getFollowerType(userId);
+    }
+
+    if (type === "mengikuti") {
+      return await getFollowingType(userId);
+    }
+
+    return await getByUserId(userId);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+const getByUserId = async (userId: string) => {
   const session = await auth();
 
-  if (!userId)
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   try {
-    const followers = await db.follow.count({ where: { followingId: userId } });
-    const following = await db.follow.count({ where: { followerId: userId } });
-
-    const isFollowing = await db.follow.findFirst({
-      where: { followerId: session.user.id, followingId: userId },
+    const followers = await db.follow.count({
+      where: { followingId: userId },
     });
 
-    return NextResponse.json({
-      followers,
-      following,
-      isFollowing: !!isFollowing,
+    const following = await db.follow.count({
+      where: { followerId: userId },
     });
+
+    const isFollowing = !!(session?.user?.id
+      ? await db.follow.findFirst({
+          where: { followerId: session.user.id, followingId: userId },
+        })
+      : null);
+
+    return NextResponse.json({ followers, following, isFollowing });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch data" },
       { status: 500 }
     );
   }
-}
+};
+
+const getFollowingType = async (userId: string) => {
+  try {
+    const data = await db.follow.findMany({
+      where: { followerId: userId },
+      include: { following: true },
+    });
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Gagal mendapatkan daftar yang diikuti" },
+      { status: 500 }
+    );
+  }
+};
+
+const getFollowerType = async (userId: string) => {
+  try {
+    const data = await db.follow.findMany({
+      where: { followingId: userId },
+      include: { follower: true },
+    });
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Gagal mendapatkan pengikut" },
+      { status: 500 }
+    );
+  }
+};
 
 // ✅ Follow User
 export async function POST(req: Request) {

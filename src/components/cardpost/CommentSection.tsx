@@ -10,6 +10,7 @@ import {
 import { Button } from "../ui/button";
 import {
   EllipsisVerticalIcon,
+  LoaderCircle,
   LoaderCircleIcon,
   MessageSquareIcon,
   SendIcon,
@@ -73,7 +74,7 @@ export const CommentSection = ({ postProps }: PostProps) => {
     },
   });
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["postcomment"],
     mutationFn: async (props: z.infer<typeof FormSchema>) => {
       const { data } = await axios.post("/api/comment", {
@@ -221,7 +222,7 @@ export const CommentSection = ({ postProps }: PostProps) => {
                       }}
                     />
                     <div>
-                      <Button size="icon" type="submit">
+                      <Button size="icon" type="submit" disabled={isPending}>
                         <SendIcon />
                       </Button>
                     </div>

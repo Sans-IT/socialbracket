@@ -9,6 +9,7 @@ import { Skeleton } from "../ui/skeleton";
 import { Post, User } from "@prisma/client";
 import { useInView } from "react-intersection-observer";
 import { LoaderCircle } from "lucide-react";
+import LoadingBar from "../loadingbar";
 
 export default function GeneralPostFeed() {
   const { data: session } = useSession();
@@ -49,13 +50,7 @@ export default function GeneralPostFeed() {
   }, [inView, hasNextPage, fetchNextPage]);
 
   if (status === "pending") {
-    return (
-      <div className="space-y-3">
-        <Skeleton className="h-[200px] w-full" />
-        <Skeleton className="h-[200px] w-full" />
-        <Skeleton className="h-[200px] w-full" />
-      </div>
-    );
+    return <LoadingBar />;
   }
 
   if (status === "error") {

@@ -1,8 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { pageSize } from "@/lib/global-var";
 import { NextRequest, NextResponse } from "next/server";
-
-const pageSize = 3; // Jumlah post per halaman
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id");

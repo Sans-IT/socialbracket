@@ -7,6 +7,7 @@ import CardPost from "@/components/cardpost/CardPost"; // Pastikan ini sesuai de
 import { useSession } from "next-auth/react";
 import { LoaderCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import LoadingBar from "@/components/loadingbar";
 
 type Props = { userId: string };
 
@@ -36,13 +37,7 @@ export default function ProfilePost({ userId }: Props) {
   }, [inView, hasNextPage]);
 
   if (status === "pending") {
-    return (
-      <div className="space-y-3">
-        <Skeleton className="h-[200px] w-full" />
-        <Skeleton className="h-[200px] w-full" />
-        <Skeleton className="h-[200px] w-full" />
-      </div>
-    );
+    return <LoadingBar />;
   }
 
   return (

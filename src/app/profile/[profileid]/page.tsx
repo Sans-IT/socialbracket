@@ -24,9 +24,7 @@ export async function generateMetadata({ params }: { params: Params }) {
   return {
     title: `${userProfile.username} - Profile`,
     description: userProfile.bio || "User profile page",
-    icons: {
-      icon: userProfile.image || "/default-avatar.png",
-    },
+    icons: userProfile.image || "/default-avatar.png",
   };
 }
 
@@ -45,7 +43,7 @@ export default async function ProfileId({
 }: {
   params: Promise<{ profileid: string }>;
 }) {
-  const profileid = (await params).profileid; // ✅ Tidak perlu await
+  const { profileid } = await params;
 
   const userProfile = await db.user.findUnique({
     where: { username: profileid },
