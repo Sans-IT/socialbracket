@@ -107,7 +107,7 @@ export default function SettingsForm({ session }: { session: Session }) {
         toast({
           variant: "destructive",
           title: "Gagal memperbarui profil",
-          description: "Terjadi kesalahan yang tidak diketahui.",
+          description: error.message,
         });
       }
     },

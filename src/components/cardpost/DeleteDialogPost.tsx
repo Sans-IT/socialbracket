@@ -49,8 +49,9 @@ export const DeleteDialogPost = ({
       return data;
     },
     onSuccess: () => {
-      query.invalidateQueries({ queryKey: ["getpost"] });
-      router.replace(`/profile/${item.author.username}`);
+      query.invalidateQueries({ queryKey: ["getpost", "user-posts"] });
+      // router.replace(`/profile/${item.author.username}`);
+      router.replace(`/`)
     },
     onError: () => {
       toast({

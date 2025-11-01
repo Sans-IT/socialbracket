@@ -63,9 +63,9 @@ export default function GeneralPostFeed() {
     <div className="space-y-5">
       {data.pages.map((group, i) => (
         <React.Fragment key={i}>
-          {group.data.map((item: Post & { author: User }) => (
+          {group?.data?.map((item: Post & { author: User }) => (
             <CardPost key={item.id} item={item} session={session} />
-          ))}
+          )) ?? null}
         </React.Fragment>
       ))}
 
