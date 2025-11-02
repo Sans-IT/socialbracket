@@ -51,7 +51,7 @@ export default function GeneralPostFeed() {
   }, [inView, hasNextPage, fetchNextPage]);
 
   // Loading pertama kali
-  if (status === "pending") return <div><LoadingBar /></div>;
+  if (status === "pending" && !data) return <div><LoadingBar /></div>;
 
   // Error fetch
   if (status === "error")
