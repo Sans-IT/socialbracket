@@ -51,13 +51,17 @@ export default function GeneralPostFeed() {
   }, [inView, hasNextPage, fetchNextPage]);
 
   // Loading pertama kali
-  if (status === "pending" && !data) return <div><LoadingBar /></div>;
+  if (status === "pending" && !data) return <LoadingBar />;
 
   // Error fetch
   if (status === "error")
     return <div className="text-center">Terjadi kesalahan: {error?.message}</div>;
 
-  const allPosts = data?.pages.flatMap((page) => page.data) || [];
+const allPosts =
+  Array.isArray(data?.pages)
+    ? data.pages.flatMap((page) => Array.isArray(page.data) ? page.data : [])
+    : [];
+console.log("data", data);
 
   return (
     <div className="space-y-5">
