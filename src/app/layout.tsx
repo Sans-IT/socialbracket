@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   title: "SocialBracket",
   description: "A social media platform",
   icons: "/logo.svg",
+  assets: ["/SocialBracket.png"],
 };
 
 export default function RootLayout({
