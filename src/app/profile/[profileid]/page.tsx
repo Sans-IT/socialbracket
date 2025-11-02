@@ -1,11 +1,9 @@
 import MaxWidthDiv from "@/components/MaxWidthDiv";
 import { db } from "@/lib/db";
 import Image from "next/image";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import FollowSection from "./follow-section";
 import ProfilePost from "./profile-post";
-import { authPages } from "@/lib/utils";
-import { auth } from "@/lib/auth";
 
 export const revalidate = 60;
 

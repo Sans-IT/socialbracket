@@ -15,7 +15,7 @@ async function BottomNav() {
     ];
 
   return (
-    <nav className='sm:hidden block w-full bg-background border-t-muted border-t-2 fixed bottom-0'>
+    <nav className='md:hidden block w-full bg-background border-t-muted border-t-2 fixed bottom-0 z-50'>
         <div className='flex items-center h-full w-full'>
             {icons.map((item) => (
                 <Link key={item.id} className='flex flex-col bg-background py-2.5 items-center w-full h-full justify-center text-foreground' href={item.link}>

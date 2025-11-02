@@ -36,7 +36,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Navbar />
-              <div className="py-5 w-full">{children}<BottomNav /></div>
+              <div className="py-5 w-full mb-10">{children}<BottomNav /></div>
               <Toaster />
             </ThemeProvider>
           </QueryProvider>

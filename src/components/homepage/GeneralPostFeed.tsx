@@ -5,10 +5,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { Skeleton } from "../ui/skeleton";
-import { Post, User } from "@prisma/client";
-import { useInView } from "react-intersection-observer";
 import { LoaderCircle } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import LoadingBar from "../loadingbar";
 
 export default function GeneralPostFeed() {
@@ -16,14 +14,17 @@ export default function GeneralPostFeed() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search");
 
-  // Fetching posts with infinite scroll
-  const fetchProjects = async ({ pageParam }: { pageParam: string | null }) => {
-    const url = searchQuery
-      ? `/api/post?search=${searchQuery}&cursor=${pageParam || ""}`
-      : `/api/post?cursor=${pageParam || ""}`;
-
-    const res = await axios.get(url);
-    return res.data;
+  const fetchPosts = async ({ pageParam }: { pageParam: string | null }) => {
+    try {
+      const url = searchQuery
+        ? `/api/post?search=${searchQuery}&cursor=${pageParam || ""}`
+        : `/api/post?cursor=${pageParam || ""}`;
+      const res = await axios.get(url);
+      return res.data; // { data: Post[], nextCursor: string | null }
+    } catch (err) {
+      console.error(err);
+      return { data: [], nextCursor: null }; // fallback
+    }
   };
 
   const { ref, inView } = useInView();
@@ -36,49 +37,53 @@ export default function GeneralPostFeed() {
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["posts", searchQuery], // Tambahkan searchQuery agar query berubah saat search berubah
-    queryFn: fetchProjects,
+    queryKey: ["posts", searchQuery],
+    queryFn: fetchPosts,
     initialPageParam: null,
-    getNextPageParam: (lastPage) => lastPage.nextCursor, // Ambil `nextCursor` dari response
+    getNextPageParam: (lastPage) => lastPage.nextCursor || null,
   });
 
-  // Fetch next page saat `inView` aktif
+  // Fetch next page saat inView
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, fetchNextPage, !data]);
 
-  if (status === "pending") {
-    return <LoadingBar />;
-  }
+  // Loading pertama kali
+  if (status === "pending") return <div><LoadingBar /></div>;
 
-  if (status === "error") {
-    return (
-      <div className="text-center">Terjadi kesalahan: {error.message}</div>
-    );
-  }
+  // Error fetch
+  if (status === "error")
+    return <div className="text-center">Terjadi kesalahan: {error?.message}</div>;
+
+  const allPosts = data?.pages.flatMap((page) => page.data) || [];
 
   return (
     <div className="space-y-5">
-      {data.pages.map((group, i) => (
-        <React.Fragment key={i}>
-          {group?.data?.map((item: Post & { author: User }) => (
-            <CardPost key={item.id} item={item} session={session} />
-          )) ?? null}
-        </React.Fragment>
-      ))}
+      {allPosts.length === 0 ? (
+        <div className="text-center py-5">Belum ada postingan</div>
+      ) : (
+        <>
+          {data?.pages?.map((group, i) => (
+            <React.Fragment key={i}>
+              {group.data.map((item: any) => (
+                <CardPost key={item.id} item={item} session={session} />
+              ))}
+            </React.Fragment>
+          ))}
 
-      {/* Observer untuk trigger infinite scroll */}
-      <div ref={ref} className="text-center py-5">
-        {isFetchingNextPage ? (
-          <LoaderCircle className="animate-spin mx-auto" />
-        ) : hasNextPage ? (
-          <LoaderCircle className="animate-spin mx-auto" />
-        ) : (
-          "Tidak ada postingan lagi"
-        )}
-      </div>
+          <div ref={ref} className="text-center py-5">
+            {isFetchingNextPage ? (
+              <LoaderCircle className="animate-spin mx-auto" />
+            ) : hasNextPage ? (
+              <LoaderCircle className="animate-spin mx-auto" />
+            ) : (
+              "Tidak ada postingan lagi"
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
