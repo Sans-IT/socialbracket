@@ -45,7 +45,6 @@ export default async function ProfileId({
 }: {
   params: Promise<{ profileid: string }>;
 }) {
-  const session = await auth();
   const { profileid } = await params;
 
   const userProfile = await db.user.findUnique({
@@ -58,8 +57,6 @@ export default async function ProfileId({
       _count: { select: { Post: true } }, // Hanya ambil jumlah post
     },
   });
-
-  if (!session) return redirect(authPages.signIn);
   if (!userProfile) return notFound();
 
   return (
