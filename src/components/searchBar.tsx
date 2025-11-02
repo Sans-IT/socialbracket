@@ -21,6 +21,7 @@ export default function SearchBar() {
       className="sm:w-1/2 bg-secondary"
       placeholder="Search"
       value={query}
+      id="search-input"
       onChange={(e) => setQuery(e.target.value)} // Update state saat input berubah
       onKeyDown={handleKeyDown} // Trigger hanya ketika Enter ditekan
     />

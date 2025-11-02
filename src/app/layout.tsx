@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import QueryProvider from "@/components/QueryProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { Poppins } from "next/font/google"; // Import Google Font
+import BottomNav from "@/components/BottomNav";
 
 // Konfigurasi font Poppins
 const poppins = Poppins({
@@ -17,7 +18,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "SocialBracket",
   description: "A social media platform",
-  icons: "/SocialBracket.png",
+  icons: "/logo.svg",
 };
 
 export default function RootLayout({
@@ -34,7 +35,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Navbar />
-              <div className="py-5 w-full">{children}</div>
+              <div className="py-5 w-full">{children}<BottomNav /></div>
               <Toaster />
             </ThemeProvider>
           </QueryProvider>

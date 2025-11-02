@@ -1,9 +1,11 @@
 import MaxWidthDiv from "@/components/MaxWidthDiv";
 import { db } from "@/lib/db";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import FollowSection from "./follow-section";
 import ProfilePost from "./profile-post";
+import { authPages } from "@/lib/utils";
+import { auth } from "@/lib/auth";
 
 export const revalidate = 60;
 
@@ -43,6 +45,7 @@ export default async function ProfileId({
 }: {
   params: Promise<{ profileid: string }>;
 }) {
+  const session = await auth();
   const { profileid } = await params;
 
   const userProfile = await db.user.findUnique({
@@ -56,6 +59,7 @@ export default async function ProfileId({
     },
   });
 
+  if (!session) return redirect(authPages.signIn);
   if (!userProfile) return notFound();
 
   return (
